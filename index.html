@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="container">
+  <div id="history-container">
+    <table id="history">
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="thread"></div>
+  <div id="form">
+    <form action="http://peace.2ch.net/test/bbs.cgi?guid=ON"
+      method="post">
+      <input name="mail" value="sage">
+      <input name="bbs" value="kitchen">
+      <input name="key" value="1438349564">
+      <input name="time" value="1439692439">
+      <textarea name="MESSAGE"></textarea>
+      <input type="submit">
+    </form>
+  </div>
+</div>
+<div id="buttons">
+  <span class="open-form btn">書き込み</span>
+  <span class="open-browser btn">ブラウザ表示</span>
+  <span class="go-bottom btn">下まで移動</span>
+</div>
+
+
+<script type="text/template" id="history-template">
+<td><span class="delete">[x]</span></td>
+<td><%- new Date(date).toString() %></td>
+<td><%- title %></td>
+<td><a href="<%- url %>" target="_blank" class="thread_url"><%- url %></a></td>
+</script>
+<script src="underscore.js"></script>
+<script src="jquery-2.1.4.min.js"></script>
+<script src="backbone.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
