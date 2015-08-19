@@ -2,32 +2,47 @@
 <html>
 <head>
   <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
 </head>
 <body>
 <div id="container">
-  <div id="history-container">
+  <div id="thread-list-container">
+    <!--
     <table id="history">
       <tbody></tbody>
     </table>
+    -->
+    <ul id="thread-list">
+    </ul>
+    
   </div>
 
   <div id="thread"></div>
-  <div id="form">
-    <form action="http://peace.2ch.net/test/bbs.cgi?guid=ON"
-      method="post">
-      <input name="mail" value="sage">
-      <input name="bbs" value="kitchen">
-      <input name="key" value="1438349564">
-      <input name="time" value="1439692439">
-      <textarea name="MESSAGE"></textarea>
-      <input type="submit">
-    </form>
-  </div>
 </div>
 <div id="buttons">
+  <span class="open-search btn">検索</span>
   <span class="open-form btn">書き込み</span>
   <span class="open-browser btn">ブラウザ表示</span>
   <span class="go-bottom btn">下まで移動</span>
+</div>
+
+<div id="form" class="popup">
+  <form action="http://peace.2ch.net/test/bbs.cgi?guid=ON"
+    method="post">
+    <input name="mail" value="sage">
+    <input name="bbs" value="kitchen">
+    <input name="key" value="1438349564">
+    <input name="time" value="1439692439">
+    <textarea name="MESSAGE"></textarea>
+    <input type="submit">
+  </form>
+</div>
+
+<div id="search" class="popup">
+  <form>
+    <input type="text" name="q">
+    <input type="submit" value="検索">
+  </form>
 </div>
 
 
@@ -37,6 +52,13 @@
 <td><%- title %></td>
 <td><a href="<%- url %>" target="_blank" class="thread_url"><%- url %></a></td>
 </script>
+
+<script type="text/template" id="thread-template">
+<a href="<%- url %>" class="thread_url"><%- title %></a>
+ | 
+<a href="<%- bbs_url %>" class="bbs_url"><%- bbs_title %></a>
+</script>
+
 <script src="underscore.js"></script>
 <script src="jquery-2.1.4.min.js"></script>
 <script src="backbone.js"></script>

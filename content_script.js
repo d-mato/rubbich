@@ -1,3 +1,4 @@
+/*
 $(function(){
 
   var res_box = $('<div>').css({
@@ -25,16 +26,6 @@ $(function(){
         anchor_count_data[m[1]] += 1;
     }
   });
-  /*
-  $('dd').each(function(){
-    var m;
-    if(m = $(this).text().match(/>>(\d+)/)){
-      var anchor_id = m[1];
-      $('dt.res_'+anchor_id);
-    }
-
-  });
-  */
   for(var id in anchor_count_data){
     var $dt = $('dt.res_'+id);
     if($dt.html() == undefined)continue;
@@ -90,9 +81,8 @@ $(function(){
     });
     
   });
-  */
   
-  /* 画面のどこかをクリックしたらres_boxを隠す */
+  // 画面のどこかをクリックしたらres_boxを隠す 
   $('body').click(function(){
     if(res_box.css('display')=='block'){
       res_box.hide();
@@ -122,3 +112,5 @@ $(function(){
   });
 
 });
+
+*/

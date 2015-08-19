@@ -18,6 +18,37 @@ var Histories = Backbone.Collection.extend({
   },
 });
 
+// thread
+var Thread = Backbone.Model.extend({
+  defaults: {
+    url: 'url',
+    title: 'title',
+    bbs_url: 'bbs_url',
+    bbs_title: 'bbs_title'
+  },
+});
+var Threads = Backbone.Collection.extend({
+  model: Thread,
+});
+var ThreadView = Backbone.View.extend({
+  tagName: 'li',
+  events: {
+    'click .thread_url': 'open_thread'
+  },
+  open_thread: function() {
+    $('#thread').html('読み込み中 ...');
+    $('#thread').load(this.model.get('url') + " [class=thread]");
+    return false;
+  },
+  template: _.template($('#thread-template').html()),
+  render: function() {
+    var t = this.template( this.model.toJSON() );
+    this.$el.html(t);
+    return this;
+  },
+});
+
+/*
 // View
 var HistoryView = Backbone.View.extend({
   tagName: 'tr',
@@ -75,9 +106,15 @@ chrome.storage.local.get({history: []} ,function(result){
   var historiesView = new HistoriesView({collection: histories});
   $('#history').append(historiesView.render().el);
 });
+*/
 
 // button
+$('.open-search').click(function(){
+  $('.popup').hide();
+  $('#search').toggle();
+});
 $('.open-form').click(function(){
+  $('.popup').hide();
   $('#form').toggle();
 });
 $('.open-browser').click(function(){
@@ -87,6 +124,41 @@ $('.go-bottom').click(function(){
   $('#thread').animate({
     scrollTop: $('#thread >').height()
   },500);
+});
+
+$('#search form').submit(function(){
+  var query_url = 'http://ff2ch.syoboi.jp/?q=' + $('[name="q"]',this).val(); 
+  $('#thread-list').html('読み込み中 ...');
+  $.get(query_url, function(data){
+    $('#thread-list').html('');
+    var html = $.parseHTML(data); // Array
+
+    $('li', $(html)).each(function() {
+      // console.log($(this).text());
+      var url,title,bbs_url,bbs_title;
+      $('a',this).each(function() {
+        var href = $(this).attr('href');
+        if(href.indexOf('read.cgi')!==-1){
+          url = href; title = $(this).text();
+        }else if(href.match(/2ch\.net\/[\w\d]+?\/$/)){
+          bbs_url = href; bbs_title = $(this).text();
+        }
+      });
+
+      var thread = new Thread({
+        url: url,
+        title: title,
+        bbs_url: bbs_url,
+        bbs_title: bbs_title,
+      });
+
+      var threadView = new ThreadView({model: thread});
+      $('#thread-list').append(threadView.render().el);
+    });
+
+    $('#search').hide();
+  });
+  return false;
 });
 
 $('#form form').submit(function(){
