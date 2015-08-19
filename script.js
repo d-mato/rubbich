@@ -72,6 +72,7 @@ $('.popup').click(function(e) {
 });
 $(document).click(function() {
   $('.popup').hide();
+  $('#res-popup').hide();
 });
 
 $('.open-search').click(function(e){
@@ -156,10 +157,30 @@ $('#form form').submit(function(){
 
 
 // スレ閲覧用の拡張スクリプト
-$('#thread').on('click', 'a', function() {
+$('#res-popup').hover(
+  function() {
+    $(this).show();
+  },
+  function() {
+    $(this).hide();
+  }
+);
+$('#thread').on('mouseover', 'a[href^="../test"]', function() {
   var href = $(this).attr('href');
   var m = href.match(/\.\.\/test\/read\.cgi\/[\d\w]+?\/\d+?\/(\d+)/);
-  console.log(m[1]);
+  if(!m)return true;
+  if(m.length !== 2)return true;
+
+  // console.log($('#res-popup').text());
+  $('#res-popup')
+    .html('')
+    .append($('#thread dt').eq(parseInt(m[1])-1).clone(true))
+    .append($('#thread dd').eq(parseInt(m[1])-1).clone(true))
+    .css({
+      display: 'block',
+      top: $(this).offset().top+10,
+      left:$(this).offset().left,
+    });
   return false;
 });
 
