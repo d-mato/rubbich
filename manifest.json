@@ -9,7 +9,7 @@
 
   "content_scripts": [
     {
-    "js": ["jquery-2.1.4.min.js","content_script.js"],
+    "js": ["lib/jquery-2.1.4.min.js","content_script.js"],
     "css": ["2chthread.css"],
     "matches": ["http://*.2ch.net/test/read.cgi/*"]
     }

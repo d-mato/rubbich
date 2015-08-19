@@ -6,17 +6,32 @@ Date.prototype.toString = function() {
         + this.toLocaleTimeString().slice(0,-3);
 }
 
-// Model
-var History = Backbone.Model.extend({
-});
+function showHistory() {
+  chrome.storage.local.get({history: []} ,function(result){
+    $('#thread-list').html('');
+    for(var i in result.history.reverse()){
+      var thread = new Thread(result.history[i]);
+      var threadView = new ThreadView({model: thread});
+      $('#thread-list').append(threadView.render().el);
+    }
+  });
+}
 
-var Histories = Backbone.Collection.extend({
-  model: History,
-  //comparatorメソッドが正しく定義されていたらsortが行われる
-  comparator: function(a, b) {
-    return b.get('date') - a.get('date');
-  },
-});
+function updateHistory(thread) { // 引数はBackboneのModel
+  chrome.storage.local.get({history: []} ,function(result){
+    result.history = result.history.filter(function(history){
+      if(thread.get('url').indexOf(history['url'])===-1){
+        return true;
+      }else{
+        return false;
+      }
+    });
+
+    thread.set('last_read', new Date());
+    result.history.push(thread.toJSON());
+    chrome.storage.local.set({history: result.history});
+  });
+}
 
 // thread
 var Thread = Backbone.Model.extend({
@@ -24,7 +39,8 @@ var Thread = Backbone.Model.extend({
     url: 'url',
     title: 'title',
     bbs_url: 'bbs_url',
-    bbs_title: 'bbs_title'
+    bbs_title: 'bbs_title',
+    last_read: 0,
   },
 });
 var Threads = Backbone.Collection.extend({
@@ -38,6 +54,7 @@ var ThreadView = Backbone.View.extend({
   open_thread: function() {
     $('#thread').html('読み込み中 ...');
     $('#thread').load(this.model.get('url') + " [class=thread]");
+    updateHistory(this.model);
     return false;
   },
   template: _.template($('#thread-template').html()),
@@ -48,74 +65,24 @@ var ThreadView = Backbone.View.extend({
   },
 });
 
-/*
-// View
-var HistoryView = Backbone.View.extend({
-  tagName: 'tr',
-  initialize: function() {
-    // このviewが管理するmodelに対してdestroyが実行されたらremoveを実行してviewを削除する
-    this.model.on('destroy', this.remove, this);
-  },
-  events: {
-    'click .delete': 'destory',
-    'click .thread_url': 'open_thread'
-  },
-  destory: function() {
-    if (confirm('Are you sure ?')) {
-      this.model.destroy();// modelを削除する
-    }
-  },
-  open_thread: function(){
-    $('#thread').html('読み込み中 ...');
-    $('#thread').load(this.model.get('url') + " [class=thread]");
-    return false;
-  },
-  // remove: function() {
-    // this.$el.remove();// viewを削除する
-  // },
-
-  template: _.template($('#history-template').html()),
-  render: function() {
-    var t = this.template( this.model.toJSON() );
-    this.$el.html(t);
-    return this;
-  },
-});
-
-var HistoriesView = Backbone.View.extend({
-  tagName: 'tbody',
-  render: function() {
-    this.collection.each(function(history) {
-      var historyView = new HistoryView({ model: history });
-      this.$el.append(historyView.render().el);
-    },this);
-    return this;
-  }
-});
-
-chrome.storage.local.get({history: []} ,function(result){
-   var histories = new Histories();
-  for(var i in result.history){
-    // result.history[i]['id'] = i;
-    var history = new History(result.history[i]);
-    histories.add(history);
-    // var historyView = new HistoryView({ model: history });
-    // $('#history > tbody').append(historyView.render().el);
-  }
-  // histories.sort();
-  var historiesView = new HistoriesView({collection: histories});
-  $('#history').append(historiesView.render().el);
-});
-*/
-
 // button
-$('.open-search').click(function(){
+$('.popup').click(function(e) {
+  $(this).show();
+  e.stopPropagation();
+});
+$(document).click(function() {
+  $('.popup').hide();
+});
+
+$('.open-search').click(function(e){
   $('.popup').hide();
   $('#search').toggle();
+  e.stopPropagation();
 });
-$('.open-form').click(function(){
+$('.open-form').click(function(e){
   $('.popup').hide();
   $('#form').toggle();
+  e.stopPropagation();
 });
 $('.open-browser').click(function(){
   chrome.tabs.create({url: 'http://2ch.net/'});
@@ -188,4 +155,13 @@ $('#form form').submit(function(){
 });
 
 
+// スレ閲覧用の拡張スクリプト
+$('#thread').on('click', 'a', function() {
+  var href = $(this).attr('href');
+  var m = href.match(/\.\.\/test\/read\.cgi\/[\d\w]+?\/\d+?\/(\d+)/);
+  console.log(m[1]);
+  return false;
+});
 
+
+showHistory();

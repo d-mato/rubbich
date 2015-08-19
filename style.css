@@ -84,6 +84,14 @@
 }
 
 
+#thread-list li {
+  white-space:nowrap;
+}
+
+#thread-list li:hover {
+  background-color:#eee;
+}
+
 .delete {
   cursor:pointer;
 }
